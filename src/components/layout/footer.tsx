@@ -45,7 +45,7 @@ const footerLinks = [
             { label: "Careers", href: "#" },
             { label: "Privacy Policy", href: "#" },
             { label: "Terms of Service", href: "#" },
-            { label: "Rewards Program", href: "#" },
+            { label: "Rewards Program", href: "/rewards" },
         ],
     },
 ]

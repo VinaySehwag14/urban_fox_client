@@ -157,7 +157,7 @@ function MobileBottomNav() {
                     <Link href="/login" className="flex flex-col items-center gap-1 px-3 py-2 text-muted-foreground hover:text-foreground transition-colors group">
                         <Avatar className="h-5 w-5 border border-transparent group-hover:border-cyan-400 transition-colors">
                             <AvatarImage src="/avatars/01.png" />
-                            <AvatarFallback className="text-[10px]">UF</AvatarFallback>
+                            <AvatarFallback className="text-[10px]">VS</AvatarFallback>
                         </Avatar>
                         <span className="text-xs font-medium">Account</span>
                     </Link>
