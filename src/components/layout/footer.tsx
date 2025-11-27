@@ -40,8 +40,8 @@ const footerLinks = [
     {
         title: "Company & Legal",
         links: [
-            { label: "About Us", href: "#" },
-            { label: "Our Story", href: "#" },
+            { label: "About Us", href: "/about-us" },
+            { label: "Our Story", href: "/about-us" },
             { label: "Careers", href: "#" },
             { label: "Privacy Policy", href: "#" },
             { label: "Terms of Service", href: "#" },

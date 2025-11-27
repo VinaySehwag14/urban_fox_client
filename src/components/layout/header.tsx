@@ -64,10 +64,12 @@ function ActionButtons() {
                 <span className="sr-only">Search</span>
             </Button>
 
-            <Button variant="ghost" size="icon" className="hidden md:flex">
-                <Heart className="h-5 w-5" />
-                <span className="sr-only">Wishlist</span>
-            </Button>
+            <Link href="/profile/saved">
+                <Button variant="ghost" size="icon" className="hidden md:flex">
+                    <Heart className="h-5 w-5" />
+                    <span className="sr-only">Wishlist</span>
+                </Button>
+            </Link>
 
             <Link href="/cart">
                 <Button variant="ghost" size="icon" className="relative">
@@ -139,7 +141,7 @@ function MobileBottomNav() {
                         <span className="text-xs font-medium">Search</span>
                     </Link>
 
-                    <Link href="/wishlist" className="flex flex-col items-center gap-1 px-3 py-2 text-muted-foreground hover:text-foreground transition-colors group">
+                    <Link href="/profile/saved" className="flex flex-col items-center gap-1 px-3 py-2 text-muted-foreground hover:text-foreground transition-colors group">
                         <Heart className="h-5 w-5 group-hover:text-cyan-400 transition-colors" />
                         <span className="text-xs font-medium">Wishlist</span>
                     </Link>
