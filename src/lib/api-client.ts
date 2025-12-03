@@ -16,10 +16,60 @@ export class ApiClient {
         return headers;
     }
 
+    /**
+     * Check if user exists in the database
+     * @param user Firebase user object
+     * @returns Promise<boolean> - true if user exists, false otherwise
+     */
+    static async checkUserExists(user: User): Promise<boolean> {
+        try {
+            const headers = await this.getAuthHeaders(user);
+            const response = await fetch(`${API_URL}/api/v1/users/verify`, {
+                method: "GET",
+                headers,
+            });
+
+            if (response.status === 404) {
+                return false;
+            }
+
+            if (!response.ok) {
+                throw new Error(`Failed to verify user: ${response.statusText}`);
+            }
+
+            return true;
+        } catch (error) {
+            console.error("Error checking user existence:", error);
+            return false;
+        }
+    }
+
+    /**
+     * Verify user exists in database and sync their data
+     * @param user Firebase user object
+     * @returns Promise<any> - User data from backend
+     * @throws Error if user doesn't exist in database
+     */
+    static async verifyAndSyncUser(user: User) {
+        try {
+            const userExists = await this.checkUserExists(user);
+
+            if (!userExists) {
+                throw new Error("USER_NOT_FOUND");
+            }
+
+            // User exists, proceed with sync
+            return await this.syncUser(user);
+        } catch (error) {
+            console.error("Error verifying and syncing user:", error);
+            throw error;
+        }
+    }
+
     static async syncUser(user: User) {
         try {
             const headers = await this.getAuthHeaders(user);
-            const response = await fetch(`${API_URL}/api/auth/sync`, {
+            const response = await fetch(`${API_URL}/api/v1/auth/sync`, {
                 method: "POST",
                 headers,
                 body: JSON.stringify({

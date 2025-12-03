@@ -64,8 +64,10 @@ export function OtpLogin() {
         setError(null)
         setLoading(true)
         try {
+            // Verify OTP with Firebase - useAuth hook will handle database verification
             await verificationId.confirm(otp)
-            router.push("/") // Redirect to home or dashboard after success
+            // Redirect after successful authentication - useAuth will verify user
+            router.push("/")
         } catch (err: any) {
             console.error("Error verifying OTP:", err)
             setError("Invalid OTP. Please try again.")

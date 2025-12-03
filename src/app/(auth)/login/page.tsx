@@ -2,19 +2,19 @@
 
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
 import { useState, useEffect } from "react"
-import { auth } from "@/lib/firebaseClient"
-import { GoogleAuthProvider, signInWithPopup } from "firebase/auth"
+import { signInWithGoogle } from "@/lib/authClient"
 import { useRouter } from "next/navigation"
 import { OtpLogin } from "@/components/auth/otp-login"
-import { Chrome } from "lucide-react"
+import { EmailLogin } from "@/components/auth/email-login"
+import { Chrome, AlertCircle } from "lucide-react"
 import { ToggleSwitch } from "@/components/ui/toggle-switch"
 import { useAuth } from "@/hooks/useAuth"
 
 export default function LoginPage() {
   const [mode, setMode] = useState<"email" | "phone">("phone") // Default to phone as per design
+  const [googleError, setGoogleError] = useState<string | null>(null)
+  const [googleLoading, setGoogleLoading] = useState(false)
   const router = useRouter()
   const { user, loading } = useAuth()
 
@@ -26,12 +26,26 @@ export default function LoginPage() {
   }, [loading, user, router])
 
   const handleGoogleLogin = async () => {
-    const provider = new GoogleAuthProvider()
+    setGoogleError(null)
+    setGoogleLoading(true)
+
     try {
-      await signInWithPopup(auth, provider)
+      // Authenticate with Google - useAuth hook will handle database verification
+      await signInWithGoogle()
+      // Redirect after successful authentication - useAuth will verify user
       router.push("/profile")
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error signing in with Google", error)
+
+      if (error.code === "auth/popup-closed-by-user") {
+        setGoogleError("Sign-in cancelled.")
+      } else if (error.code === "auth/popup-blocked") {
+        setGoogleError("Popup blocked. Please allow popups for this site.")
+      } else {
+        setGoogleError("Failed to sign in with Google. Please try again.")
+      }
+    } finally {
+      setGoogleLoading(false)
     }
   }
 
@@ -70,23 +84,7 @@ export default function LoginPage() {
         />
 
         <div className="grid gap-6">
-          {mode === "email" ? (
-            <>
-              <div className="grid gap-2">
-                <Label htmlFor="email" className="text-base font-medium">Email</Label>
-                <Input id="email" type="email" placeholder="m@example.com" required className="h-11 bg-muted/20 border-input/50" />
-              </div>
-              <div className="grid gap-2">
-                <Label htmlFor="password" className="text-base font-medium">Password</Label>
-                <Input id="password" type="password" required className="h-11 bg-muted/20 border-input/50" />
-              </div>
-              <Button className="w-full h-11 rounded-full bg-[#0EA5E9] hover:bg-[#0284C7] text-white font-medium text-base shadow-md transition-all">
-                Sign in
-              </Button>
-            </>
-          ) : (
-            <OtpLogin />
-          )}
+          {mode === "email" ? <EmailLogin /> : <OtpLogin />}
 
           <div className="relative py-2">
             <div className="absolute inset-0 flex items-center">
@@ -99,8 +97,20 @@ export default function LoginPage() {
             </div>
           </div>
 
+          {googleError && (
+            <div className="bg-destructive/15 text-destructive text-sm p-3 rounded-md flex items-center gap-2">
+              <AlertCircle className="w-4 h-4 flex-shrink-0" />
+              <span>{googleError}</span>
+            </div>
+          )}
+
           <div className="flex gap-4">
-            <Button variant="outline" className="w-full h-12 rounded-full border-input/50 hover:bg-muted/20" onClick={handleGoogleLogin}>
+            <Button
+              variant="outline"
+              className="w-full h-12 rounded-full border-input/50 hover:bg-muted/20"
+              onClick={handleGoogleLogin}
+              disabled={googleLoading}
+            >
               <Chrome className="mr-2 h-5 w-5" />
               <span className="text-sm">Login with Gmail</span>
             </Button>
