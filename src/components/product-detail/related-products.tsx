@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import ProductCard from "@/components/products/product-card";
 import { ApiClient } from "@/lib/api-client";
-import { mapApiProductToProduct, Product } from "@/types/product";
+import { mapApiProductToProduct, Product, ApiProduct } from "@/types/product";
 
 interface RelatedProductsProps {
     categoryName?: string;
@@ -26,11 +26,11 @@ export default function RelatedProducts({ categoryName, currentProductId }: Rela
                     categoryName ? { category: categoryName, limit: 8 } : { limit: 8 }
                 );
 
-                // Map and filter out the current product
+                // Filter out the current product, then map to UI format
                 const mappedProducts = response.products
-                    .filter(p => p.id !== currentProductId)
-                    .map(mapApiProductToProduct)
-                    .slice(0, 4); // Limit to 4 products
+                    .filter((apiProduct: ApiProduct) => apiProduct.id !== currentProductId)
+                    .slice(0, 4) // Limit to 4 products
+                    .map(mapApiProductToProduct);
 
                 setProducts(mappedProducts);
             } catch (err) {
