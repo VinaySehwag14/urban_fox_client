@@ -5,9 +5,6 @@ import { ChevronLeft, ChevronRight, ArrowRight } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
-import { ApiClient } from "@/lib/api-client";
-import { Banner } from "@/types/banner";
-import { Button } from "@/components/ui/button";
 
 interface Slide {
     id: number;
@@ -19,37 +16,41 @@ interface Slide {
     imageAlt: string;
 }
 
+// Static banner data for faster loading (no API call needed)
+const STATIC_SLIDES: Slide[] = [
+    {
+        id: 1,
+        title: "Winter Collection",
+        subtitle: "Stay warm and stylish with our exclusive winter essentials. Premium quality fabrics for the cold season.",
+        buttonText: "Shop Collection",
+        buttonLink: "/products?category=winter",
+        image: "/carousel/winter-collection.jpg",
+        imageAlt: "Winter Collection",
+    },
+    {
+        id: 2,
+        title: "New Arrivals",
+        subtitle: "Discover the latest trends and fresh styles. Be the first to explore our newest additions.",
+        buttonText: "Shop Collection",
+        buttonLink: "/products?sort=newest",
+        image: "/carousel/new-arrivals.jpg",
+        imageAlt: "New Arrivals",
+    },
+    {
+        id: 3,
+        title: "Summer Edit",
+        subtitle: "Light, breezy, and effortlessly chic. Get ready for the sunshine with our summer collection.",
+        buttonText: "Shop Collection",
+        buttonLink: "/products?category=summer",
+        image: "/carousel/summer-edit.jpg",
+        imageAlt: "Summer Edit",
+    },
+];
+
 export default function HeroCarousel() {
-    const [slides, setSlides] = useState<Slide[]>([]);
-    const [error, setError] = useState<string | null>(null);
+    const [slides] = useState<Slide[]>(STATIC_SLIDES);
     const [currentSlide, setCurrentSlide] = useState(0);
     const [isAutoPlaying, setIsAutoPlaying] = useState(true);
-
-    // Fetch banners from API
-    useEffect(() => {
-        const fetchBanners = async () => {
-            try {
-                setError(null);
-                const response = await ApiClient.getBanners();
-                const activeBanners: Slide[] = response.banners
-                    .filter((banner: Banner) => banner.is_active)
-                    .map((banner: Banner, index: number) => ({
-                        id: index + 1,
-                        title: banner.title,
-                        subtitle: banner.sub_text,
-                        buttonText: "Shop Collection",
-                        buttonLink: banner.link,
-                        image: banner.image,
-                        imageAlt: banner.title,
-                    }));
-                setSlides(activeBanners);
-            } catch (err) {
-                console.error("Failed to fetch banners:", err);
-                setError("Failed to load banners");
-            }
-        };
-        fetchBanners();
-    }, []);
 
     const nextSlide = useCallback(() => {
         setCurrentSlide((prev) => (prev + 1) % slides.length);
@@ -70,13 +71,6 @@ export default function HeroCarousel() {
         return () => clearInterval(interval);
     }, [isAutoPlaying, nextSlide, slides.length]);
 
-    if (error || (slides.length === 0 && !error)) {
-        return (
-            <div className="w-full h-[60vh] flex items-center justify-center bg-muted/20 rounded-3xl border border-dashed">
-                <p className="text-muted-foreground">{error || "No current offers"}</p>
-            </div>
-        );
-    }
 
     return (
         <div className="relative w-full h-[110vh] min-h-[700px] overflow-hidden bg-black mx-auto">
